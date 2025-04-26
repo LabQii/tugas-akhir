@@ -1,0 +1,9 @@
+streamlit
+pandas
+numpy
+requests
+seaborn
+matplotlib
+scikit-learn
+pyclustering
+streamlit-option-menu
