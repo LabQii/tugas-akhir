@@ -105,7 +105,7 @@ st.markdown("""
     </style>
 
     <h1 style='text-align: center; color: #2c3e50;'>
-        OPTIMASI CLUSTER DI KECAMATAN SAMPANG <br> DENGAN METODE K-MEDOIDS DAN FUZZY K-MEDOIDS TYPE-2
+        OPTIMALISASI CLUSTER UMKM DI KECAMATAN SAMPANG DENGAN METODE FUZZY K-MEDOIDS TYPE-2
     </h1>
     <p style='text-align: center; color: #95a5a6;'>Copyright © 2025 Muhammad Iqbal Firmansyah - iqbalcode.nt@gmail.com</p>
     <hr style='border:1px solid #bdc3c7'>
@@ -146,7 +146,7 @@ html("""
 
 # Layout
 col1, col2 = st.columns([1, 3])
-tabs = ["Upload File", "Normalisasi Data", "K-Medoids", "Fuzzy K-Medoids Type-2", "Klasifikasi SVM", "Hasil Analisa"]
+tabs = ["Beranda", "Upload File", "Normalisasi Data", "K-Medoids", "Fuzzy K-Medoids Type-2", "Validasi (SVM)", "Hasil Analisa"]
 
 with col1:
     selected_tab = option_menu(
@@ -192,7 +192,7 @@ with col2:
     st.markdown(f'<div class="custom-subheader">{selected_tab}</div>', unsafe_allow_html=True)
     
     if selected_tab == "Upload File":
-        st.info("Silakan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
+        st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
         uploaded_file = st.file_uploader("Unggah File Dataset", type=["csv", "xlsx", "xls"])
         gdrive_url = st.text_input("Atau masukkan link Google Drive / Spreadsheet (berbagi publik)")
 
@@ -232,6 +232,44 @@ with col2:
         except Exception as e:
             st.error(f"Terjadi kesalahan saat membaca file: {e}")
 
+    elif selected_tab == "Beranda":    
+        st.image("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiGMhFIzKtT8g5WEOQ_-NsHxqHNc3PFHYY8UWF9_rVV1d4U7Bj_ky8ODzk1nxKMRAi2EXXPr4mIG3MjKR5BCbyDNq4KSSpGfHM3q4tH-UD8P7qd9MWMOBmzAnkls2D4pL5H-XRvkF0lHjX2fZoqo6kcNAnfzYHgoLeKla_EQI3aPiy5-waq2Q6lSpjJ/s1280/alun%20alun%20terbesar%20di%20kabupaten%20sampang.jpg", width=1100)
+
+        # Subheader Permasalahan
+        st.markdown('<div class="custom-subheader">Permasalahan</div>', unsafe_allow_html=True)
+        st.markdown("""
+        UMKM di Kecamatan Sampang menghadapi berbagai tantangan seperti keterbatasan akses permodalan, kesulitan dalam mengakses informasi pasar, serta adaptasi digital yang belum optimal. Pandemi COVID-19 semakin memperburuk situasi dengan penurunan pendapatan dan gangguan pada rantai pasokan. Oleh karena itu, diperlukan pemetaan UMKM yang lebih akurat berdasarkan karakteristik serupa untuk meningkatkan daya saing mereka.
+        """, unsafe_allow_html=True)
+
+        # Subheader Metode Usulan
+        st.markdown('<div class="custom-subheader">Metode Usulan</div>', unsafe_allow_html=True)
+        st.markdown("""
+        Penelitian ini mengusulkan penggunaan **Fuzzy K-Medoids Type-2 Clustering**, yang menggabungkan kekuatan K-Medoids dan fleksibilitas Fuzzy Type-2 dalam menangani ketidakpastian dan variasi data UMKM. Metode ini memungkinkan pengelompokan yang lebih relevan dengan karakteristik dinamis UMKM. Untuk menentukan jumlah cluster optimal, digunakan metode **Partition Coefficient (PC)**, dan kualitas clustering dievaluasi dengan **Support Vector Machine (SVM)**.
+        """, unsafe_allow_html=True)
+
+        # Subheader Pertanyaan Penelitian
+        st.markdown('<div class="custom-subheader">Pertanyaan Penelitian</div>', unsafe_allow_html=True)
+        st.markdown("""
+        1. Sejauh mana penerapan metode **Fuzzy K-Medoids Type-2** dapat meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang dibandingkan dengan metode **K-Medoids**?
+        2. Bagaimana hasil evaluasi menggunakan metode **Partition Coefficient (PC)** dalam menentukan jumlah cluster optimal dan uji validasi dengan **Support Vector Machine (SVM)** untuk mengukur konsistensi dan relevansi cluster dalam pengelompokan UMKM di Kecamatan Sampang?
+        """, unsafe_allow_html=True)
+
+        # Subheader Tujuan dan Manfaat
+        st.markdown('<div class="custom-subheader">Tujuan dan Manfaat</div>', unsafe_allow_html=True)
+        st.markdown("""
+        **Tujuan**:
+        - Untuk mengevaluasi efektivitas penerapan metode **Fuzzy K-Medoids Type-2** dalam meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang, dengan membandingkannya dengan metode **K-Medoids**.
+        - Untuk menentukan jumlah cluster optimal dalam pengelompokan UMKM menggunakan metode **Partition Coefficient (PC)** dan menguji konsistensi serta relevansi cluster yang terbentuk dengan **Support Vector Machine (SVM)**.
+
+        **Manfaat**:
+        - Memberikan wawasan lebih dalam mengenai pendekatan clustering yang fleksibel dan akurat untuk mengelompokkan UMKM di Kecamatan Sampang, yang dapat digunakan sebagai referensi dalam strategi pengembangan sektor UMKM.
+        - Menyediakan strategi segmentasi yang lebih tepat sasaran berdasarkan karakteristik UMKM di Kecamatan Sampang, yang dapat mendukung kebijakan dan program pemerintah dalam memperkuat daya saing dan ketahanan UMKM.
+        - Memberikan solusi berbasis data yang dapat diimplementasikan oleh pemerintah daerah dan pelaku usaha untuk merancang strategi pengembangan yang lebih efektif dan efisien sesuai dengan potensi dan kebutuhan masing-masing kelompok UMKM.
+        """, unsafe_allow_html=True)
+
+        st.info("Silahkan lanjut ke tab **Upload File** untuk memulai analisis datamu")
+
+
     elif selected_tab == "Normalisasi Data":
         if st.session_state.df is not None:
             if not st.session_state.normalisasi_diproses:
@@ -257,12 +295,12 @@ with col2:
                 st.success("✅ Data sudah dinormalisasi sebelumnya. Hasil ditampilkan di bawah ini:")
                 st.dataframe(st.session_state.df_cleaned.head(1000))
         else:
-            st.warning("Silakan unggah data terlebih dahulu di tab 'Upload File'.")
+            st.warning("Silahkan unggah data terlebih dahulu di tab **Upload File**")
 
 
     elif selected_tab == "K-Medoids":
         if not st.session_state.normalisasi_diproses:
-            st.warning("Silakan lakukan normalisasi data terlebih dahulu di tab 'Normalisasi Data'.")
+            st.warning("Silahkan lakukan normalisasi data terlebih dahulu di tab **Normalisasi Data**")
         else:
             df_encoded = st.session_state.df_encoded.copy()
             numerical_columns = ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin_Ada', 'Surat Izin_Tidak Ada']
@@ -356,7 +394,7 @@ with col2:
     
     elif selected_tab == "Fuzzy K-Medoids Type-2":
         if not st.session_state.normalisasi_diproses:
-            st.warning("Silakan lakukan normalisasi data terlebih dahulu di tab 'Normalisasi Data'.")
+            st.warning("Silahkan lakukan normalisasi data **Normalisasi Data**")
         else:
             number_of_clusters = st.slider("Pilih Jumlah Cluster", min_value=2, max_value=5, value=2)
             max_iter = st.slider("Pilih Maksimal Iterasi", min_value=10, max_value=100, value=20)
@@ -505,8 +543,8 @@ with col2:
                     cluster_data = df_encoded[df_encoded['Cluster_FuzzyType2'] == i]
                     st.dataframe(cluster_data.reset_index(drop=True))
 
-    elif selected_tab == "Klasifikasi SVM":
-        st.info("Silakan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
+    elif selected_tab == "Validasi (SVM)":
+        st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
         uploaded_file_svm = st.file_uploader("Unggah File Dataset", type=["csv", "xlsx", "xls"])
         gdrive_url = st.text_input("Atau masukkan link Google Drive / Spreadsheet (berbagi publik)")
 
@@ -651,10 +689,10 @@ with col2:
             else:
                 st.error("File tidak memiliki kolom 'Cluster_KMedoids' atau 'Cluster_FuzzyType2'.")
         else:
-            st.info("Silakan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Klasifikasi")
+            st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Klasifikasi")
 
     elif selected_tab == "Hasil Analisa":
-        st.info("Silakan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
+        st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
         uploaded_file = st.file_uploader("Unggah File Dataset", type=["csv", "xlsx", "xls"])
         gdrive_url = st.text_input("Atau masukkan link Google Drive / Spreadsheet (berbagi publik)", key="analisa_gdrive")
 
@@ -769,9 +807,9 @@ with col2:
                 df_summary['Kategori UMKM'] = df_summary['Skor Kategori'].apply(label_umkm)
 
         else:
-            st.info("Silakan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Analisa Cluster")
+            st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Analisa Cluster")
 
 
 
     else:
-        st.info("Silakan unggah data terlebih dahulu melalui tab 'Upload File'.")
+        st.info("Silahkan unggah data terlebih dahulu melalui tab **Upload File**")
