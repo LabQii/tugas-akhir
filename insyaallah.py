@@ -44,7 +44,6 @@ if 'fuzzy_upper' not in st.session_state:
     st.session_state.fuzzy_upper = None
 
 
-
 # Title
 st.markdown("""
     <style>
@@ -100,7 +99,7 @@ st.markdown("""
         margin-top: 15px;
         margin-bottom: 10px;
     }  
-            
+    
             
     </style>
 
@@ -146,7 +145,7 @@ html("""
 
 # Layout
 col1, col2 = st.columns([1, 3])
-tabs = ["Beranda", "Upload File", "Normalisasi Data", "K-Medoids", "Fuzzy K-Medoids Type-2", "Validasi (SVM)", "Hasil Analisa"]
+tabs = ["Beranda", "Upload File", "Normalisasi Data", "K-Medoids", "Fuzzy K-Medoids Type-2", "Hasil Analisa"]
 
 with col1:
     selected_tab = option_menu(
@@ -190,7 +189,7 @@ with col1:
 
 with col2:
     st.markdown(f'<div class="custom-subheader">{selected_tab}</div>', unsafe_allow_html=True)
-    
+
     if selected_tab == "Upload File":
         st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
         uploaded_file = st.file_uploader("Unggah File Dataset", type=["csv", "xlsx", "xls"])
@@ -251,7 +250,7 @@ with col2:
         st.markdown('<div class="custom-subheader">Pertanyaan Penelitian</div>', unsafe_allow_html=True)
         st.markdown("""
         1. Sejauh mana penerapan metode **Fuzzy K-Medoids Type-2** dapat meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang dibandingkan dengan metode **K-Medoids**?
-        2. Bagaimana hasil evaluasi menggunakan metode **Partition Coefficient (PC)** dalam menentukan jumlah cluster optimal dan uji validasi dengan **Support Vector Machine (SVM)** untuk mengukur konsistensi dan relevansi cluster dalam pengelompokan UMKM di Kecamatan Sampang?
+        2. Bagaimana hasil evaluasi menggunakan metode **Silhouette Coefficient (SC)** dan**Partition Coefficient (PC)** dalam menentukan jumlah cluster optimal untuk mengukur konsistensi dan relevansi cluster dalam pengelompokan UMKM di Kecamatan Sampang?
         """, unsafe_allow_html=True)
 
         # Subheader Tujuan dan Manfaat
@@ -259,7 +258,7 @@ with col2:
         st.markdown("""
         **Tujuan**:
         - Untuk mengevaluasi efektivitas penerapan metode **Fuzzy K-Medoids Type-2** dalam meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang, dengan membandingkannya dengan metode **K-Medoids**.
-        - Untuk menentukan jumlah cluster optimal dalam pengelompokan UMKM menggunakan metode **Partition Coefficient (PC)** dan menguji konsistensi serta relevansi cluster yang terbentuk dengan **Support Vector Machine (SVM)**.
+        - Untuk menentukan jumlah cluster optimal dalam pengelompokan UMKM menggunakan metode **Silhouette Coefficient (SC)** dan **Partition Coefficient (PC)**.
 
         **Manfaat**:
         - Memberikan wawasan lebih dalam mengenai pendekatan clustering yang fleksibel dan akurat untuk mengelompokkan UMKM di Kecamatan Sampang, yang dapat digunakan sebagai referensi dalam strategi pengembangan sektor UMKM.
@@ -275,11 +274,35 @@ with col2:
             if not st.session_state.normalisasi_diproses:
                 if st.button("Jalankan Proses Normalisasi"):
                     df = st.session_state.df.copy()
+
+                    # ==================== Bersihkan dan encoding kolom Surat Izin ====================
+                    df['Surat Izin'] = df['Surat Izin'].astype(str).str.strip().str.title()
+                    df['Surat Izin'] = df['Surat Izin'].replace({
+                        'Ya': 'Ada',
+                        'S': 'Tidak Ada',
+                        'Na': 'Tidak Ada',
+                        'Nan': 'Tidak Ada',
+                        '': 'Tidak Ada'
+                    })
+
+                    # Hanya izinkan dua kategori: Ada & Tidak Ada
+                    df = df[df['Surat Izin'].isin(['Ada', 'Tidak Ada'])]
+
+                    # ==================== Tampilkan distribusi hasil encoding ====================
+                    st.markdown('<div class="custom-subheader">Distribusi Kolom `Surat Izin` Setelah Encoding</div>', unsafe_allow_html=True)
+                    st.dataframe(df['Surat Izin'].value_counts().reset_index().rename(columns={'index': 'Kategori', 'Surat Izin': 'Jumlah'}))
+
+                    # ==================== Tampilkan missing values ====================
+                    st.markdown('<div class="custom-subheader">Jumlah Missing Values per Kolom</div>', unsafe_allow_html=True)
+                    missing_values = df.isnull().sum()
+                    st.dataframe(missing_values[missing_values > 0].reset_index().rename(columns={'index': 'Kolom', 0: 'Jumlah Missing'}))
+
+                    # ==================== Lanjutkan get_dummies & normalisasi ====================
                     df_encoded = pd.get_dummies(df, columns=['Surat Izin'], drop_first=False)
                     df_encoded['Surat Izin_Ada'] = df_encoded['Surat Izin_Ada'].astype(int)
                     df_encoded['Surat Izin_Tidak Ada'] = df_encoded['Surat Izin_Tidak Ada'].astype(int)
 
-                    # Normalisasi tanpa penghapusan outlier
+                    # Normalisasi
                     scaler = MinMaxScaler()
                     numerical_columns = ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin_Ada', 'Surat Izin_Tidak Ada']
                     df_encoded[numerical_columns] = scaler.fit_transform(df_encoded[numerical_columns])
@@ -289,14 +312,14 @@ with col2:
                     st.session_state.normalisasi_diproses = True
                     st.session_state.kmedoids_diproses = False
 
-                    st.success("Normalisasi berhasil dilakukan")
-                    st.dataframe(df_encoded.head(1000))
+                    st.success("✅ Normalisasi berhasil dilakukan")
+                    st.markdown('<div class="custom-subheader">Preview Data Setelah Normalisasi</div>', unsafe_allow_html=True)
+                    st.dataframe(df_encoded.head(2000))
             else:
                 st.success("✅ Data sudah dinormalisasi sebelumnya. Hasil ditampilkan di bawah ini:")
-                st.dataframe(st.session_state.df_cleaned.head(1000))
+                st.dataframe(st.session_state.df_cleaned.head(2000))
         else:
             st.warning("Silahkan unggah data terlebih dahulu di tab **Upload File**")
-
 
     elif selected_tab == "K-Medoids":
         if not st.session_state.normalisasi_diproses:
@@ -309,27 +332,47 @@ with col2:
             k = st.slider("Jumlah Cluster", min_value=2, max_value=10, value=2)
 
             if st.button("Jalankan Proses K-Medoids"):
-                # Gunakan medoid manual yang sudah ditentukan sebelumnya
-                manual_medoids = {
-                    2: [527, 1019],
-                    3: [527, 1019, 850],
-                    4: [527, 1019, 850, 300],
-                    5: [527, 1019, 850, 300, 100],
-                    6: [527, 1019, 850, 300, 100, 700],
-                    7: [527, 1019, 850, 300, 100, 700, 200],
-                    8: [527, 1019, 850, 300, 100, 700, 200, 400],
-                    9: [527, 1019, 850, 300, 100, 700, 200, 400, 50],
-                    10: [527, 1019, 850, 300, 100, 700, 200, 400, 50, 600],
-                }
+                # Tentukan medoid berdasarkan jumlah data
+                if len(data_scaled) == 1275:
+                    manual_medoids = {
+                        2: [527, 1019],
+                        3: [527, 1019, 850],
+                        4: [527, 1019, 850, 300],
+                        5: [527, 1019, 850, 300, 100],
+                        6: [527, 1019, 850, 300, 100, 700],
+                        7: [527, 1019, 850, 300, 100, 700, 200],
+                        8: [527, 1019, 850, 300, 100, 700, 200, 400],
+                        9: [527, 1019, 850, 300, 100, 700, 200, 400, 50],
+                        10: [527, 1019, 850, 300, 100, 700, 200, 400, 50, 600],
+                    }
+                elif len(data_scaled) == 638:
+                    # Tentukan medoid untuk data 638 secara manual
+                    manual_medoids = {
+                        2: [200, 500],
+                        3: [200, 400, 600],
+                        4: [100, 250, 400, 600],
+                        5: [50, 200, 350, 500, 600],
+                        6: [50, 150, 250, 350, 450, 600],
+                        7: [50, 100, 200, 300, 400, 500, 600],
+                        8: [50, 100, 150, 200, 300, 400, 500, 600],
+                        9: [25, 100, 150, 200, 300, 400, 500, 550, 600],
+                        10: [20, 80, 150, 200, 300, 350, 400, 450, 500, 600],
+                    }
+                else:
+                    manual_medoids = {
+                        i: list(np.random.choice(len(data_scaled), i, replace=False))
+                        for i in range(2, 11)
+                    }
+
                 initial_medoids = [i for i in manual_medoids.get(k, [0, len(data_scaled)//2]) if i < len(data_scaled)]
 
+                # Proses K-Medoids dengan medoid awal yang ditentukan
                 kmedoids_instance = kmedoids(data_scaled.tolist(), initial_medoids, data_type='points')
                 kmedoids_instance.process()
 
                 clusters = kmedoids_instance.get_clusters()
                 final_medoids = kmedoids_instance.get_medoids()
 
-                # Buat label untuk setiap data
                 labels = np.zeros(len(data_scaled))
                 for cluster_idx, cluster in enumerate(clusters):
                     for data_idx in cluster:
@@ -357,11 +400,13 @@ with col2:
                 for i, cluster in enumerate(clusters):
                     st.markdown(f"- Cluster {i+1}: {len(cluster)} data poin")
 
-                score = silhouette_score(data_scaled, labels)
-                st.markdown('<div class="custom-subheader">Evaluasi Silhouette Score</div>', unsafe_allow_html=True)
-                st.success(f"Silhouette Score untuk {k} Cluster: {score:.4f}")
+                if len(set(labels)) > 1:
+                    score = silhouette_score(data_scaled, labels)
+                    st.markdown('<div class="custom-subheader">Evaluasi Silhouette Score</div>', unsafe_allow_html=True)
+                    st.success(f"Silhouette Score untuk {k} Cluster: {score:.4f}")
+                else:
+                    st.warning("⚠️ Tidak bisa menghitung Silhouette Score karena hanya satu cluster terbentuk.")
 
-                # Tampilkan data per cluster
                 df_result = df_encoded.copy()
                 df_result['Cluster'] = labels
 
@@ -370,8 +415,7 @@ with col2:
                     st.markdown(f'<div class="cluster-header"> Cluster {i+1}</div>', unsafe_allow_html=True)
                     st.dataframe(df_result[df_result['Cluster'] == i].reset_index(drop=True))
 
-                # Tombol untuk menampilkan TSNE
-                if st.button("Tampilkan Grafik TSNE"):
+                if st.button("Tampilkan Grafik"):
                     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
                     data_2d = tsne.fit_transform(data_scaled)
 
@@ -381,23 +425,23 @@ with col2:
                         points = np.array([data_2d[idx] for idx in cluster])
                         ax.scatter(points[:, 0], points[:, 1], s=60, color=colors[i], label=f'Cluster {i+1}')
 
-                    # Plot medoid
                     medoid_points = np.array([data_2d[idx] for idx in medoid_indices])
                     ax.scatter(medoid_points[:, 0], medoid_points[:, 1], s=200, c='black', marker='X', label='Medoids')
 
-                    ax.set_title("Visualisasi Hasil Clustering dengan TSNE")
-                    ax.set_xlabel("TSNE-1")
-                    ax.set_ylabel("TSNE-2")
+                    ax.set_title("Visualisasi Hasil Clustering")
+                    ax.set_xlabel("X")
+                    ax.set_ylabel("Y")
                     ax.legend()
                     ax.grid(True)
                     st.pyplot(fig)
+
     
     elif selected_tab == "Fuzzy K-Medoids Type-2":
         if not st.session_state.normalisasi_diproses:
             st.warning("Silahkan lakukan normalisasi data **Normalisasi Data**")
         else:
             number_of_clusters = st.slider("Pilih Jumlah Cluster", min_value=2, max_value=5, value=2)
-            max_iter = st.slider("Pilih Maksimal Iterasi", min_value=10, max_value=100, value=20)
+            max_iter = st.slider("Pilih Maksimal Iterasi", min_value=5, max_value=20, value=20)
 
             if 'fuzzy_result' not in st.session_state:
                 st.session_state.fuzzy_result = None
@@ -410,12 +454,34 @@ with col2:
                 m = 2
                 epsilon = 1e-5
 
-                dist_matrix = pairwise_distances(data_scaled)
-                max_dist_idx = np.unravel_index(np.argmax(dist_matrix), dist_matrix.shape)
-                idx1, idx2 = max_dist_idx
-                medoids = np.array([data_scaled[idx1], data_scaled[idx2]])[:number_of_clusters]
+                # dist_matrix = pairwise_distances(data_scaled)
+                # max_dist_idx = np.unravel_index(np.argmax(dist_matrix), dist_matrix.shape)
+                # idx1, idx2 = max_dist_idx
+                # medoids = np.array([data_scaled[idx1], data_scaled[idx2]])[:number_of_clusters]
 
-                st.success(f"Medoid awal diambil dari index {idx1} dan {idx2}")
+                # st.success(f"Medoid awal diambil dari index {idx1} dan {idx2}")
+
+                # Tentukan medoid awal berdasarkan jumlah data
+                if len(data_scaled) == 1275:
+                    medoid_indices = {
+                        2: [527, 1019],
+                        3: [527, 1019, 850],
+                        4: [527, 1019, 850, 300],
+                        5: [527, 1019, 850, 300, 100],
+                    }.get(number_of_clusters, [0, len(data_scaled)//2])
+                elif len(data_scaled) == 638:
+                    medoid_indices = {
+                        2: [200, 500],
+                        3: [200, 400, 600],
+                        4: [100, 250, 400, 600],
+                        5: [50, 200, 350, 500, 600],
+                    }.get(number_of_clusters, [0, len(data_scaled)//2])
+                else:
+                    medoid_indices = list(np.random.choice(len(data_scaled), number_of_clusters, replace=False))
+
+                medoids = np.array([data_scaled[i] for i in medoid_indices])
+                st.success(f"Medoid awal diambil dari index: {medoid_indices}")
+
 
                 def compute_membership(data, medoids, m):
                     n_samples = len(data)
@@ -543,153 +609,6 @@ with col2:
                     cluster_data = df_encoded[df_encoded['Cluster_FuzzyType2'] == i]
                     st.dataframe(cluster_data.reset_index(drop=True))
 
-    elif selected_tab == "Validasi (SVM)":
-        st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
-        uploaded_file_svm = st.file_uploader("Unggah File Dataset", type=["csv", "xlsx", "xls"])
-        gdrive_url = st.text_input("Atau masukkan link Google Drive / Spreadsheet (berbagi publik)")
-
-        df_uploaded = None
-
-        try:
-            if uploaded_file_svm is not None:
-                df_uploaded = pd.read_csv(uploaded_file_svm) if uploaded_file_svm.name.endswith(".csv") else pd.read_excel(uploaded_file_svm)
-                st.success("✅ File dari komputer berhasil diunggah!")
-            elif gdrive_url:
-                if "drive.google.com" in gdrive_url:
-                    file_id = gdrive_url.split("/d/")[1].split("/")[0]
-                    download_url = f"https://drive.google.com/uc?id={file_id}"
-                    response = requests.get(download_url)
-                    if response.status_code == 200:
-                        df_uploaded = pd.read_excel(BytesIO(response.content))
-                        st.success("✅ File dari Google Drive berhasil dimuat!")
-                elif "docs.google.com/spreadsheets" in gdrive_url:
-                    sheet_id = gdrive_url.split("/d/")[1].split("/")[0]
-                    sheet_url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
-                    df_uploaded = pd.read_csv(sheet_url)
-                    st.success("✅ Spreadsheet dari Google Sheets berhasil dimuat!")
-                else:
-                    st.warning("Masukkan link Google Drive atau Spreadsheet yang valid.")
-        except Exception as e:
-            st.error(f"Terjadi kesalahan saat membaca file: {e}")
-
-        if df_uploaded is not None:
-            st.dataframe(df_uploaded.head(10))
-
-            available_clusters = []
-            if 'Cluster_KMedoids' in df_uploaded.columns:
-                available_clusters.append('Cluster_KMedoids')
-            if 'Cluster_FuzzyType2' in df_uploaded.columns:
-                available_clusters.append('Cluster_FuzzyType2')
-
-            if available_clusters:
-                target_column = st.selectbox(
-                    "Pilih Kolom Cluster untuk Klasifikasi", 
-                    available_clusters, 
-                    key="select_target_svm"
-                )
-
-                # Siapkan data X, y
-                df_clean = df_uploaded.copy()
-
-                if 'Surat Izin' in df_clean.columns and df_clean['Surat Izin'].dtype == object:
-                    df_clean['Surat Izin'] = df_clean['Surat Izin'].map({'Ada': 1, 'Tidak Ada': 0})
-
-                fitur_columns = ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin']
-                X = df_clean[fitur_columns]
-                y = df_clean[target_column]
-
-                # Tambahkan ini setelah ambil X
-                for col in ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset']:
-                    X[col] = pd.to_numeric(X[col], errors='coerce')
-
-
-                for col in ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset']:
-                    max_val = X[col].max()
-                    if max_val != 0:
-                        X[col] = X[col] / max_val
-
-                X = X.dropna()
-                y = y[X.index]
-
-                X_train, X_test, y_train, y_test = train_test_split(
-                    X, y, test_size=0.25, random_state=42, stratify=y
-                )
-
-                if st.button("Jalankan Klasifikasi SVM"):
-                    svm = SVC(kernel='rbf', random_state=42)
-                    svm.fit(X_train, y_train)
-                    y_pred = svm.predict(X_test)
-
-                    accuracy = accuracy_score(y_test, y_pred)
-                    st.success(f"Akurasi Model SVM : `{accuracy:.2f}`")
-
-                    report = classification_report(y_test, y_pred, output_dict=True)
-                    report_df = pd.DataFrame(report).transpose()
-                    st.markdown('<div class="custom-subheader">Classification Report</div>', unsafe_allow_html=True)
-                    st.dataframe(report_df.style.format({"precision": "{:.2f}", "recall": "{:.2f}", "f1-score": "{:.2f}", "support": "{:.0f}"}))
-
-                    cm = confusion_matrix(y_test, y_pred)
-                    st.markdown('<div class="custom-subheader">Confusion Matrix</div>', unsafe_allow_html=True)
-                    fig, ax = plt.subplots(figsize=(5, 3))
-                    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-                                xticklabels=sorted(y.unique()), yticklabels=sorted(y.unique()))
-                    plt.xlabel("Predicted")
-                    plt.ylabel("Actual")
-                    plt.title("Confusion Matrix - SVM")
-                    st.pyplot(fig)
-
-                if st.button("Hitung Cross Validation (CV=5)"):
-                    cv_scores = cross_val_score(SVC(kernel='rbf', random_state=42), X, y, cv=5, scoring='accuracy')
-                    st.markdown('<div class="custom-subheader">Hasil Cross Validation</div>', unsafe_allow_html=True)
-                    st.write(f"Cross-validation scores: `{cv_scores}`")
-                    st.write(f"Mean accuracy: `{np.mean(cv_scores):.2f}`")
-                    st.write(f"Standard deviation: `{np.std(cv_scores):.2f}`")
-
-                if st.button("Cek Overfitting / Underfitting"):
-                    train_accuracies = []
-                    test_accuracies = []
-                    kernels = ['linear', 'rbf']
-
-                    for kernel in kernels:
-                        model = SVC(kernel=kernel, random_state=42)
-                        model.fit(X_train, y_train)
-                        train_acc = accuracy_score(y_train, model.predict(X_train))
-                        test_acc = accuracy_score(y_test, model.predict(X_test))
-                        train_accuracies.append(train_acc)
-                        test_accuracies.append(test_acc)
-
-                    fig, ax = plt.subplots(figsize=(6, 4))
-                    index = np.arange(len(kernels))
-                    bar_width = 0.35
-
-                    ax.bar(index, train_accuracies, bar_width, label='Training Accuracy', color='green', alpha=0.7)
-                    ax.bar(index + bar_width, test_accuracies, bar_width, label='Test Accuracy', color='red', alpha=0.7)
-                    ax.set_xlabel("Kernel Type")
-                    ax.set_ylabel("Accuracy")
-                    ax.set_title("Analisis Overfitting & Underfitting")
-                    ax.set_xticks(index + bar_width / 2)
-                    ax.set_xticklabels(kernels)
-                    ax.legend()
-                    ax.grid(True)
-                    st.pyplot(fig)
-
-                    max_train_acc = max(train_accuracies)
-                    max_test_acc = max(test_accuracies)
-
-                    st.markdown('<div class="custom-subheader">Diagnosis Model</div>', unsafe_allow_html=True)
-                    st.write(f"Max training accuracy: `{max_train_acc:.2f}`")
-                    st.write(f"Max test accuracy: `{max_test_acc:.2f}`")
-
-                    if max_train_acc - max_test_acc > 0.1:
-                        st.warning("⚠️ Kemungkinan Overfitting terdeteksi!")
-                    elif max_train_acc < 0.7 and max_test_acc < 0.7:
-                        st.warning("⚠️ Kemungkinan Underfitting terdeteksi!")
-                    else:
-                        st.success("✅ Model berjalan dengan baik dan seimbang.")
-            else:
-                st.error("File tidak memiliki kolom 'Cluster_KMedoids' atau 'Cluster_FuzzyType2'.")
-        else:
-            st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Klasifikasi")
 
     elif selected_tab == "Hasil Analisa":
         st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
@@ -808,8 +727,6 @@ with col2:
 
         else:
             st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Analisa Cluster")
-
-
 
     else:
         st.info("Silahkan unggah data terlebih dahulu melalui tab **Upload File**")
