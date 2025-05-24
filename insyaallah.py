@@ -440,7 +440,7 @@ with col2:
         if not st.session_state.normalisasi_diproses:
             st.warning("Silahkan lakukan normalisasi data **Normalisasi Data**")
         else:
-            number_of_clusters = st.slider("Pilih Jumlah Cluster", min_value=2, max_value=5, value=2)
+            number_of_clusters = st.slider("Pilih Jumlah Cluster", min_value=2, max_value=10, value=2)
             max_iter = st.slider("Pilih Maksimal Iterasi", min_value=5, max_value=20, value=20)
 
             if 'fuzzy_result' not in st.session_state:
@@ -468,6 +468,11 @@ with col2:
                         3: [527, 1019, 850],
                         4: [527, 1019, 850, 300],
                         5: [527, 1019, 850, 300, 100],
+                        6: [527, 1019, 850, 600, 300, 100],
+                        7: [527, 1019, 850, 700, 500, 300, 100],
+                        8: [527, 1019, 850, 700, 600, 400, 200, 100],
+                        9: [527, 1019, 850, 750, 650, 550, 450, 250, 100],
+                        10: [527, 1019, 850, 750, 650, 550, 450, 350, 250, 100],
                     }.get(number_of_clusters, [0, len(data_scaled)//2])
                 elif len(data_scaled) == 638:
                     medoid_indices = {
@@ -475,6 +480,11 @@ with col2:
                         3: [200, 400, 600],
                         4: [100, 250, 400, 600],
                         5: [50, 200, 350, 500, 600],
+                        6: [50, 150, 250, 350, 500, 600],
+                        7: [50, 150, 250, 350, 450, 550, 600],
+                        8: [30, 100, 200, 300, 400, 500, 580, 630],
+                        9: [30, 90, 150, 210, 270, 330, 390, 500, 600],
+                        10: [20, 70, 120, 170, 220, 270, 320, 400, 500, 600],
                     }.get(number_of_clusters, [0, len(data_scaled)//2])
                 else:
                     medoid_indices = list(np.random.choice(len(data_scaled), number_of_clusters, replace=False))
@@ -730,3 +740,5 @@ with col2:
 
     else:
         st.info("Silahkan unggah data terlebih dahulu melalui tab **Upload File**")
+
+    
