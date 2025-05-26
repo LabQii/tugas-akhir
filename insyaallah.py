@@ -237,33 +237,35 @@ with col2:
         # Subheader Permasalahan
         st.markdown('<div class="custom-subheader">Permasalahan</div>', unsafe_allow_html=True)
         st.markdown("""
-        UMKM di Kecamatan Sampang menghadapi berbagai tantangan seperti keterbatasan akses permodalan, kesulitan dalam mengakses informasi pasar, serta adaptasi digital yang belum optimal. Pandemi COVID-19 semakin memperburuk situasi dengan penurunan pendapatan dan gangguan pada rantai pasokan. Oleh karena itu, diperlukan pemetaan UMKM yang lebih akurat berdasarkan karakteristik serupa untuk meningkatkan daya saing mereka.
+        UMKM di Kecamatan Sampang, khususnya sektor perikanan, memiliki peran penting dalam mendukung perekonomian lokal. Namun, mereka menghadapi berbagai tantangan seperti keterbatasan permodalan, ketimpangan informasi pasar, dan belum optimalnya adaptasi terhadap teknologi. Pandemi COVID-19 memperparah kondisi dengan menurunnya omset dan gangguan distribusi hasil produksi. Untuk meningkatkan ketahanan dan daya saing UMKM, diperlukan pemetaan dan pengelompokan berbasis data riil. Data yang dikumpulkan mencakup variabel seperti jumlah pekerja, kapasitas produksi, omset, aset, dan surat izin. Namun, nilai-nilai pada data tersebut menunjukkan ketidakteraturan, seperti perbedaan skala yang ekstrem antar UMKM.
+        Sebagai contoh, terdapat UMKM dengan kapasitas produksi 100 liter namun memiliki aset hanya satu juta rupiah, sementara UMKM lain dengan kapasitas produksi sedikit lebih besar memiliki aset lima belas kali lipat. Ketidakseimbangan semacam ini membuat metode klasterisasi konvensional seperti K-Medoids kurang efektif karena tidak mampu menangani ambiguitas dan ketidakpastian data. Oleh karena itu, digunakan metode Fuzzy K-Medoids Type-2 yang memiliki kemampuan untuk menangani data dengan ketidakpastian tinggi, representasi keanggotaan ganda (fuzzy), dan ketahanan terhadap noise, sehingga lebih cocok untuk menghasilkan pengelompokan UMKM yang efisien dan bermanfaat dalam penyusunan strategi pengembangan yang tepat sasaran.
         """, unsafe_allow_html=True)
 
         # Subheader Metode Usulan
         st.markdown('<div class="custom-subheader">Metode Usulan</div>', unsafe_allow_html=True)
         st.markdown("""
-        Penelitian ini mengusulkan penggunaan **Fuzzy K-Medoids Type-2 Clustering**, yang menggabungkan kekuatan K-Medoids dan fleksibilitas Fuzzy Type-2 dalam menangani ketidakpastian dan variasi data UMKM. Metode ini memungkinkan pengelompokan yang lebih relevan dengan karakteristik dinamis UMKM. Untuk menentukan jumlah cluster optimal, digunakan metode **Partition Coefficient (PC)**, dan kualitas clustering dievaluasi dengan **Support Vector Machine (SVM)**.
-        """, unsafe_allow_html=True)
+         Penelitian ini mengusulkan metode Fuzzy K-Medoids Type-2 Clustering, yang menggabungkan kekuatan K-Medoids dengan fleksibilitas Fuzzy Type-2 untuk menangani ketidakpastian dan variasi data UMKM, menghasilkan pengelompokan yang lebih relevan. Sebelum penerapan metode ini, penelitian mengikuti alur metodologis CRISP-DM (Cross-Industry Standard Process for Data Mining) yang terdiri dari tahapan-tahapan penting, dimulai dengan pemahaman bisnis untuk mengidentifikasi masalah dan tujuan penelitian. Selanjutnya, pemahaman data dilakukan untuk mengeksplorasi dan mempersiapkan data yang relevan dengan masalah yang ada. Dalam tahap persiapan data, data UMKM yang telah dikumpulkan akan dibersihkan dan diproses agar siap untuk dianalisis. Pada tahap selanjutnya, metode Fuzzy K-Medoids Type-2 diterapkan untuk melakukan clustering. Untuk menentukan jumlah cluster optimal, digunakan metode Partition Coefficient (PC), yang mengukur kekompakan data dalam cluster.
 
         # Subheader Pertanyaan Penelitian
         st.markdown('<div class="custom-subheader">Pertanyaan Penelitian</div>', unsafe_allow_html=True)
         st.markdown("""
-        1. Sejauh mana penerapan metode **Fuzzy K-Medoids Type-2** dapat meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang dibandingkan dengan metode **K-Medoids**?
-        2. Bagaimana hasil evaluasi menggunakan metode **Silhouette Coefficient (SC)** dan**Partition Coefficient (PC)** dalam menentukan jumlah cluster optimal untuk mengukur konsistensi dan relevansi cluster dalam pengelompokan UMKM di Kecamatan Sampang?
+        1. Sejauh mana penerapan metode Fuzzy K-Medoids Type-2 dapat meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang dibandingkan dengan metode K-Medoids?
+        2. Bagaimana hasil evaluasi menggunakan metode Silhouette Coefficient dibandingkan dengan Partition Coefficient dalam menentukan jumlah klaster optimal dalam pengelompokan UMKM di Kecamatan Sampang?
+        3. Bagaimana label hasil klaster yang terbentuk berdasarkan jumlah klaster optimal yang telah ditentukan?
         """, unsafe_allow_html=True)
 
         # Subheader Tujuan dan Manfaat
         st.markdown('<div class="custom-subheader">Tujuan dan Manfaat</div>', unsafe_allow_html=True)
         st.markdown("""
         **Tujuan**:
-        - Untuk mengevaluasi efektivitas penerapan metode **Fuzzy K-Medoids Type-2** dalam meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang, dengan membandingkannya dengan metode **K-Medoids**.
-        - Untuk menentukan jumlah cluster optimal dalam pengelompokan UMKM menggunakan metode **Silhouette Coefficient (SC)** dan **Partition Coefficient (PC)**.
+        1. Untuk mengevaluasi efektivitas penerapan metode Fuzzy K-Medoids Type-2 dalam meningkatkan akurasi pengelompokan UMKM di Kecamatan Sampang, dengan membandingkannya dengan metode K-Medoids.
+        2. Untuk menentukan jumlah klaster optimal dalam pengelompokan UMKM menggunakan perbandingan metode Silhouette Coefficient dan Partition Coefficient (PC).
+        3. Untuk menganalisis dan menginterpretasikan label hasil klaster berdasarkan jumlah klaster optimal yang telah ditentukan, sehingga dapat memberikan gambaran pola pengelompokan UMKM di Kecamatan Sampang.
 
         **Manfaat**:
-        - Memberikan wawasan lebih dalam mengenai pendekatan clustering yang fleksibel dan akurat untuk mengelompokkan UMKM di Kecamatan Sampang, yang dapat digunakan sebagai referensi dalam strategi pengembangan sektor UMKM.
-        - Menyediakan strategi segmentasi yang lebih tepat sasaran berdasarkan karakteristik UMKM di Kecamatan Sampang, yang dapat mendukung kebijakan dan program pemerintah dalam memperkuat daya saing dan ketahanan UMKM.
-        - Memberikan solusi berbasis data yang dapat diimplementasikan oleh pemerintah daerah dan pelaku usaha untuk merancang strategi pengembangan yang lebih efektif dan efisien sesuai dengan potensi dan kebutuhan masing-masing kelompok UMKM.
+        1. Memberikan wawasan lebih dalam mengenai pendekatan Clustering yang fleksibel dan efisien untuk mengelompokkan UMKM di Kecamatan Sampang, yang dapat digunakan sebagai referensi dalam strategi pengembangan sektor UMKM.
+        2. Menyediakan strategi segmentasi yang lebih tepat sasaran berdasarkan karakteristik UMKM di Kecamatan Sampang, yang dapat mendukung kebijakan dan program pemerintah dalam memperkuat daya saing dan ketahanan UMKM.
+        3. Memberikan solusi berbasis data yang dapat diimplementasikan oleh pemerintah daerah dan pelaku usaha untuk merancang strategi pengembangan yang lebih efektif dan efisien sesuai dengan potensi dan kebutuhan masing-masing kelompok UMKM.
         """, unsafe_allow_html=True)
 
         st.info("Silahkan lanjut ke tab **Upload File** untuk memulai analisis datamu")
@@ -707,7 +709,7 @@ with col2:
                 df_summary['Kategori UMKM'] = kategori_umkm
 
                 # Tampilkan tabel summary
-                st.markdown('<div class="custom-subheader">Analisa Cluster Berdasarkan SPK</div>', unsafe_allow_html=True)
+                st.markdown('<div class="custom-subheader">Analisa Cluster</div>', unsafe_allow_html=True)
                 st.dataframe(df_summary.set_index('Cluster'))
 
                 # Analisis tambahan berdasarkan kombinasi indikator
