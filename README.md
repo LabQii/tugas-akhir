@@ -4,7 +4,7 @@
 
 Proyek ini bertujuan untuk mengoptimalkan klasterisasi UMKM (Usaha Mikro Kecil dan Menengah) di Kecamatan Sampang dengan menggunakan metode **Fuzzy K-Medoids Type-2**. Proses klasterisasi ini membantu untuk menganalisis dan mengategorikan UMKM berdasarkan berbagai faktor data yang dapat digunakan untuk pengambilan keputusan yang lebih baik dalam pengembangan ekonomi lokal.
 
-![Homepage](https://github.com/labqii/tugas-akhir/homepage.png)
+![Homepage](https://github.com/LabQii/tugas-akhir/blob/main/homepage.png)
 
 ## Fitur
 
@@ -36,7 +36,7 @@ Untuk menjalankan proyek ini secara lokal, Anda memerlukan Python terinstal. Iku
 
 1. Clone/Download repositori:
    ```bash
-   git clone https://github.com/labqii/tugas-akhir.git
+   git clone https://github.com/LabQii/tugas-akhir.git
 2. Buka Tools (Visual Studio Code):
    ```bash
    Buka Visual Studio Code (Visual Studio Code) atau editor pilihan Anda, dan buka folder repositori yang telah di-clone.
