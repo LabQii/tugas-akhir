@@ -105,7 +105,7 @@ st.markdown("""
     </style>
 
     <h1 style='text-align: center; color: #2c3e50;'>
-        OPTIMALISASI CLUSTER UMKM DI KECAMATAN SAMPANG DENGAN METODE FUZZY K-MEDOIDS TYPE-2
+        OPTIMALISASI KLASTER UMKM DI KECAMATAN SAMPANG DENGAN METODE FUZZY K-MEDOIDS TYPE-2
     </h1>
     <p style='text-align: center; color: #95a5a6;'>Copyright © 2025 Muhammad Iqbal Firmansyah - iqbalcode.nt@gmail.com</p>
     <hr style='border:1px solid #bdc3c7'>
