@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import cross_val_score
+import io
                     
 # Set page config
 st.set_page_config(layout="wide", page_title="Clustering Sampang")
@@ -349,7 +350,6 @@ with col2:
                         10: [527, 1019, 850, 300, 100, 700, 200, 400, 50, 600],
                     }
                 elif len(data_scaled) == 638:
-                    # Tentukan medoid untuk data 638 secara manual
                     manual_medoids = {
                         2: [200, 500],
                         3: [200, 400, 600],
@@ -411,13 +411,42 @@ with col2:
                     st.warning("⚠️ Tidak bisa menghitung Silhouette Score karena hanya satu cluster terbentuk.")
 
                 df_result = df_encoded.copy()
-                df_result['Cluster'] = labels
+                df_result['Cluster_KMedoids'] = labels + 1  # Shift cluster labels to start from 1
 
+                # Displaying Data per Cluster
                 st.markdown('<div class="custom-subheader">Data per Cluster</div>', unsafe_allow_html=True)
-                for i in range(k):
-                    st.markdown(f'<div class="cluster-header"> Cluster {i+1}</div>', unsafe_allow_html=True)
-                    st.dataframe(df_result[df_result['Cluster'] == i].reset_index(drop=True))
+                for i in range(1, k + 1):  # Start from 1 instead of 0
+                    st.markdown(f'<div class="cluster-header">Cluster {i}</div>', unsafe_allow_html=True)
+                    st.dataframe(df_result[df_result['Cluster_KMedoids'] == i].reset_index(drop=True))
 
+                # Provide download button for CSV
+                if st.button("Klik disini untuk mengunduh file Hasil Clustering"):
+                    # Restore original data (before normalization)
+                    df_original = st.session_state.df.copy()
+
+                    # Merge the original data with the clustering results
+                    df_cleaned = df_original.loc[df_result.index].copy()
+                    df_cleaned['Cluster_KMedoids'] = df_result['Cluster_KMedoids']
+
+                    # Select columns to be included in the final CSV
+                    final_columns = ['Nama Usaha', 'Jenis Usaha', 'Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin', 'Cluster_KMedoids']
+                    df_for_download = df_cleaned[final_columns]
+
+                    # Save to CSV
+                    csv = df_for_download.to_csv(index=False).encode()
+
+                    # Create file in memory with BytesIO
+                    csv_file = io.BytesIO(csv)
+
+                    # Display download button
+                    st.download_button(
+                        label="Unduh Hasil Clustering (CSV)",
+                        data=csv_file,
+                        file_name="hasil_clustering_nonfuzzy.csv",
+                        mime="text/csv"
+                    )
+
+                # Provide button to visualize clustering result with t-SNE
                 if st.button("Tampilkan Grafik"):
                     tsne = TSNE(n_components=2, perplexity=30, random_state=42)
                     data_2d = tsne.fit_transform(data_scaled)
@@ -438,44 +467,39 @@ with col2:
                     ax.grid(True)
                     st.pyplot(fig)
 
-    
+
     elif selected_tab == "Fuzzy K-Medoids Type-2":
         if not st.session_state.normalisasi_diproses:
             st.warning("Silahkan lakukan normalisasi data **Normalisasi Data**")
         else:
             number_of_clusters = st.slider("Pilih Jumlah Cluster", min_value=2, max_value=10, value=2)
-            max_iter = st.slider("Pilih Maksimal Iterasi", min_value=5, max_value=20, value=20)
+            max_iter = st.slider("Pilih Maksimal Iterasi", min_value=5, max_value=30, value=30)
+
+            alpha = 0.05  # Set default alpha value
 
             if 'fuzzy_result' not in st.session_state:
                 st.session_state.fuzzy_result = None
 
             if st.button("Jalankan Proses Fuzzy K-Medoids Type-2"):
-                df_encoded = st.session_state.df_encoded.copy()
+                df_encoded = st.session_state.df_encoded.copy()  # Copy df_encoded
                 numerical_columns = ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin_Ada', 'Surat Izin_Tidak Ada']
                 data_scaled = df_encoded[numerical_columns].values
 
                 m = 2
                 epsilon = 1e-5
 
-                # dist_matrix = pairwise_distances(data_scaled)
-                # max_dist_idx = np.unravel_index(np.argmax(dist_matrix), dist_matrix.shape)
-                # idx1, idx2 = max_dist_idx
-                # medoids = np.array([data_scaled[idx1], data_scaled[idx2]])[:number_of_clusters]
-
-                # st.success(f"Medoid awal diambil dari index {idx1} dan {idx2}")
-
                 # Tentukan medoid awal berdasarkan jumlah data
                 if len(data_scaled) == 1275:
                     medoid_indices = {
-                        2: [527, 1019],
-                        3: [527, 1019, 850],
-                        4: [527, 1019, 850, 300],
-                        5: [527, 1019, 850, 300, 100],
-                        6: [527, 1019, 850, 600, 300, 100],
-                        7: [527, 1019, 850, 700, 500, 300, 100],
-                        8: [527, 1019, 850, 700, 600, 400, 200, 100],
-                        9: [527, 1019, 850, 750, 650, 550, 450, 250, 100],
-                        10: [527, 1019, 850, 750, 650, 550, 450, 350, 250, 100],
+                        2: [55, 882],  
+                        3: [55, 882, 850],
+                        4: [55, 882, 850, 300],
+                        5: [55, 882, 850, 300, 100],
+                        6: [55, 882, 850, 600, 300, 100],
+                        7: [55, 882, 850, 700, 500, 300, 100],
+                        8: [55, 882, 850, 700, 600, 400, 200, 100],
+                        9: [55, 882, 850, 750, 650, 550, 450, 250, 100],
+                        10: [55, 882, 850, 750, 650, 550, 450, 350, 250, 100],
                     }.get(number_of_clusters, [0, len(data_scaled)//2])
                 elif len(data_scaled) == 638:
                     medoid_indices = {
@@ -495,22 +519,24 @@ with col2:
                 medoids = np.array([data_scaled[i] for i in medoid_indices])
                 st.success(f"Medoid awal diambil dari index: {medoid_indices}")
 
-
-                def compute_membership(data, medoids, m):
+                def compute_membership(data, medoids, m, alpha):
                     n_samples = len(data)
                     n_clusters = len(medoids)
                     lower = np.zeros((n_samples, n_clusters))
+                    middle = np.zeros((n_samples, n_clusters))
                     upper = np.zeros((n_samples, n_clusters))
 
                     for i in range(n_samples):
                         for j in range(n_clusters):
                             dist_ij = np.linalg.norm(data[i] - medoids[j]) + 1e-10
                             sum_ratio = sum([(dist_ij / (np.linalg.norm(data[i] - medoids[k]) + 1e-10)) ** (2 / (m - 1)) for k in range(n_clusters)])
-                            u_ij = 1 / sum_ratio
-                            lower[i][j] = max(0, u_ij - 0.05)
-                            upper[i][j] = min(1, u_ij + 0.05)
+                            u_ij = 1 / sum_ratio  # middle membership (type-1)
+                            middle[i][j] = u_ij
 
-                    return lower, upper
+                            lower[i][j] = max(0, u_ij - alpha * u_ij)
+                            upper[i][j] = min(1, u_ij + alpha * u_ij)
+
+                    return lower, middle, upper
 
                 progress_bar = st.progress(0)
                 status_text = st.empty()
@@ -518,7 +544,7 @@ with col2:
                 loss_per_iteration = []
 
                 for iteration in range(max_iter):
-                    lower, upper = compute_membership(data_scaled, medoids, m)
+                    lower, middle, upper = compute_membership(data_scaled, medoids, m, alpha)
 
                     new_medoids = []
                     total_cost = 0
@@ -530,7 +556,7 @@ with col2:
                         for candidate_idx in range(len(data_scaled)):
                             cost = 0
                             for i in range(len(data_scaled)):
-                                u_ij = (lower[i][j] + upper[i][j]) / 2
+                                u_ij = (lower[i][j] + 2 * middle[i][j] + upper[i][j]) / 4
                                 cost += (u_ij ** m) * np.linalg.norm(data_scaled[i] - data_scaled[candidate_idx]) ** 2
 
                             if cost < min_cost:
@@ -552,17 +578,30 @@ with col2:
 
                     medoids = new_medoids
 
-                cluster_result = np.argmax((lower + upper) / 2, axis=1)
+                membership_final = (lower + middle + upper) / 3
+                cluster_result = np.argmax(membership_final, axis=1)
                 df_encoded['Cluster_FuzzyType2'] = cluster_result
 
-                # Simpan lower dan upper
+                # Simpan lower, middle, upper di session_state
                 st.session_state.fuzzy_lower = lower
+                st.session_state.fuzzy_middle = middle
                 st.session_state.fuzzy_upper = upper
+
+                def partition_coefficient(lower, middle, upper):
+                    n_samples, n_clusters = lower.shape
+                    pc_sum = 0
+                    for i in range(n_samples):
+                        for j in range(n_clusters):
+                            u = (lower[i][j] + 2 * middle[i][j] + upper[i][j]) / 4
+                            pc_sum += u ** 2
+                    return pc_sum / n_samples
+
+                PC = partition_coefficient(lower, middle, upper)
 
                 st.session_state.fuzzy_result = {
                     'df_result': df_encoded,
                     'loss_per_iteration': loss_per_iteration,
-                    'partition_coefficient': sum(((lower[i][j] + upper[i][j]) / 2) ** 2 for i in range(len(lower)) for j in range(len(lower[0]))) / len(lower)
+                    'partition_coefficient': PC
                 }
 
             if st.session_state.fuzzy_result is not None:
@@ -571,6 +610,9 @@ with col2:
                 PC = st.session_state.fuzzy_result['partition_coefficient']
 
                 numerical_columns = ['Jumlah Pekerja', 'Kapasitas Produksi', 'Omset', 'Aset', 'Surat Izin_Ada', 'Surat Izin_Tidak Ada']
+
+                # Update cluster labels to start from 1 (instead of 0)
+                df_encoded['Cluster_FuzzyType2'] = df_encoded['Cluster_FuzzyType2'] + 1
 
                 st.markdown('<div class="custom-subheader">Data Hasil Cluster Fuzzy K-Medoids Type-2</div>', unsafe_allow_html=True)
                 st.dataframe(df_encoded)
@@ -590,9 +632,6 @@ with col2:
                 st.markdown('<div class="custom-subheader">Visualisasi Clustering dengan t-SNE</div>', unsafe_allow_html=True)
 
                 # Proses t-SNE
-                from sklearn.manifold import TSNE
-                import seaborn as sns
-
                 X = df_encoded[numerical_columns].values
                 tsne = TSNE(n_components=2, perplexity=30, n_iter=1000, random_state=42)
                 X_tsne = tsne.fit_transform(X)
@@ -616,12 +655,43 @@ with col2:
                 ax.grid(True)
                 st.pyplot(fig)
 
-                st.markdown('<div class="custom-subheader">Data Per Cluster</div>', unsafe_allow_html=True)
-                for i in range(number_of_clusters):
-                    st.markdown(f'<div class="cluster-header"> Cluster {i+1}</div>', unsafe_allow_html=True)
-                    cluster_data = df_encoded[df_encoded['Cluster_FuzzyType2'] == i]
-                    st.dataframe(cluster_data.reset_index(drop=True))
+                # Display Data Per Cluster
+                st.markdown('<div class="custom-subheader">Unduh Hasil Cluster</div>', unsafe_allow_html=True)
 
+                # Modify for download: Adjust cluster labels and index starting from 1
+                df_original = st.session_state.df.copy()
+
+                df_cleaned = df_original.loc[df_encoded.index].copy()  # Match the indices
+                df_cleaned['Cluster_FuzzyType2'] = df_encoded['Cluster_FuzzyType2']
+
+                # Kembalikan kolom 'Surat Izin' ke bentuk semula
+                if 'Surat Izin_Ada' in df_cleaned.columns:
+                    df_cleaned['Surat Izin'] = df_cleaned.apply(
+                        lambda row: 'Ada' if row['Surat Izin_Ada'] == 1 else 'Tidak Ada', axis=1
+                    )
+
+                # Kembalikan kolom-kolom lainnya
+                df_cleaned['Nama Usaha'] = df_original['Nama Usaha'].values
+                df_cleaned['Jenis Usaha'] = df_original['Jenis Usaha'].values
+
+                # Pilih kolom akhir yang dibutuhkan
+                final_columns = ['Nama Usaha', 'Jenis Usaha', 'Jumlah Pekerja', 'Kapasitas Produksi',
+                                'Omset', 'Aset', 'Surat Izin', 'Cluster_FuzzyType2']
+                df_result = df_cleaned[final_columns]
+
+                # Save to CSV and provide download button
+                csv = df_result.to_csv(index=False).encode()
+
+                # Membuat objek file dalam memori dengan BytesIO
+                csv_file = io.BytesIO(csv)
+
+                # Tombol untuk mendownload file CSV
+                st.download_button(
+                    label="Unduh Hasil Clustering (CSV)",
+                    data=csv_file,
+                    file_name="hasil_clustering_fuzzy.csv",
+                    mime="text/csv"
+                )
 
     elif selected_tab == "Hasil Analisa":
         st.info("Silahkan upload file lokal (.csv, .xlsx, dll) atau masukkan link Google Drive / Spreadsheet")
@@ -743,5 +813,3 @@ with col2:
 
     else:
         st.info("Silahkan unggah data terlebih dahulu melalui tab **Upload File**")
-
-    
