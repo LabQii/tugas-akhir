@@ -783,6 +783,20 @@ with col2:
                 st.markdown('<div class="custom-subheader">Analisa Cluster</div>', unsafe_allow_html=True)
                 st.dataframe(df_summary.set_index('Cluster'))
 
+                # Menambahkan Tabel Berdasarkan Klaster
+                st.markdown('<div class="custom-subheader">Detail Setiap Klaster</div>', unsafe_allow_html=True)
+                for cluster_id in sorted(df_clustered[cluster_col].unique()):
+                    cluster_data = df_clustered[df_clustered[cluster_col] == cluster_id]
+                    cluster_name = f"Klaster {cluster_id}"
+
+                    # Tabel detail untuk setiap klaster
+                    cluster_name = f"Klaster {cluster_id}"
+                    kategori_text = f"**Kategori**: {df_summary.loc[df_summary['Cluster'] == f'Cluster {cluster_id}', 'Kategori UMKM'].values[0]}"
+
+                    # Gabungkan keduanya dalam satu st.success
+                    st.success(f"{cluster_name} - {kategori_text}")
+                    st.dataframe(cluster_data)
+
                 # Analisis tambahan berdasarkan kombinasi indikator
                 df_summary['Skor Kategori'] = (
                     df_summary['Omset Rata-rata'].rank(method='min', ascending=True) +
@@ -808,8 +822,9 @@ with col2:
 
                 df_summary['Kategori UMKM'] = df_summary['Skor Kategori'].apply(label_umkm)
 
-        else:
-            st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Analisa Cluster")
+            else:
+                st.info("Silahkan upload file hasil clustering K-Medodis/Fuzzy K-Medoids untuk memulai Analisa Cluster")
+
 
     else:
         st.info("Silahkan unggah data terlebih dahulu melalui tab **Upload File**")
