@@ -633,7 +633,7 @@ with col2:
 
                 # Proses t-SNE
                 X = df_encoded[numerical_columns].values
-                tsne = TSNE(n_components=2, perplexity=30, n_iter=1000, random_state=42)
+                tsne = TSNE(n_components=2, perplexity=30, n_iter_without_progress=1000, random_state=42)
                 X_tsne = tsne.fit_transform(X)
 
                 df_encoded['TSNE-1'] = X_tsne[:, 0]
